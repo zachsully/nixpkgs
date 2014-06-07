@@ -3,14 +3,14 @@
 , pythonPackages, cacert, cmake, makeWrapper }:
 
 stdenv.mkDerivation rec {
-  rev = "6f64ee699ba46c90b55d3b99c60e4807819e2b7b";
-  version = "0.4.4-rev${rev}";
+  rev = "70d2b0ad8eb7854932d24c007a05b8627f751205";
+  version = "1.0-rev${rev}";
   name = "weechat-${version}";
 
   src = fetchgit {
     inherit rev;
     url = "git://github.com/weechat/weechat.git";
-    sha256 = "1w58gir48kxvscf6njy3kmfxbjlnsf2byw3g3w6r47zjkgyxcf1z";
+    sha256 = "1k7kcrq46anq87r14sq3vrhij8acn6id7zxyhn0qnjj2wqgrjp5i";
   };
 
   buildInputs = 
