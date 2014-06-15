@@ -278,6 +278,8 @@ let
     dotnetfx = dotnetfx40;
   };
 
+  scatterOutputHook = makeSetupHook {} ../build-support/setup-hooks/scatter_output.sh;
+
   vsenv = callPackage ../build-support/vsenv {
     vs = vs90wrapper;
   };
@@ -1609,6 +1611,8 @@ let
 
   nilfs_utils = callPackage ../tools/filesystems/nilfs-utils {};
 
+  nitrogen = callPackage ../tools/X11/nitrogen {};
+
   nlopt = callPackage ../development/libraries/nlopt {};
 
   npapi_sdk = callPackage ../development/libraries/npapi-sdk {};
@@ -2113,6 +2117,8 @@ let
   sitecopy = callPackage ../tools/networking/sitecopy { };
 
   privoxy = callPackage ../tools/networking/privoxy { };
+
+  t1utils = callPackage ../tools/misc/t1utils { };
 
   tarsnap = callPackage ../tools/backup/tarsnap { };
 
@@ -2939,11 +2945,8 @@ let
 
   haxe = callPackage ../development/compilers/haxe { };
 
-  hiphopvm = callPackage ../development/interpreters/hiphopvm {
-    libevent = libevent14;
-    boost = boost149;
-    stdenv = overrideGCC stdenv gcc48;
-  };
+  hhvm = callPackage ../development/compilers/hhvm { };
+  hiphopvm = hhvm; /* Compatibility alias */
 
   falcon = builderDefsPackage (import ../development/interpreters/falcon) {
     inherit cmake;
@@ -3552,6 +3555,8 @@ let
 
   racket = callPackage ../development/interpreters/racket { };
 
+  rakudo = callPackage ../development/interpreters/rakudo { };
+
   rascal = callPackage ../development/interpreters/rascal { };
 
   regina = callPackage ../development/interpreters/regina { };
@@ -3672,6 +3677,8 @@ let
 
 
   ### DEVELOPMENT / TOOLS
+
+  ansible = callPackage ../tools/system/ansible { };
 
   antlr = callPackage ../development/tools/parsing/antlr/2.7.7.nix { };
 
@@ -4635,7 +4642,9 @@ let
 
   gperftools = callPackage ../development/libraries/gperftools { };
 
-  gst_all_1 = recurseIntoAttrs(callPackage ../development/libraries/gstreamer { });
+  gst_all_1 = recurseIntoAttrs(callPackage ../development/libraries/gstreamer {
+    callPackage = pkgs.newScope (pkgs // { libav = pkgs.libav_9; });
+  });
 
   gst_all = {
     inherit (pkgs) gstreamer gnonlin gst_python qt_gstreamer;
@@ -4841,8 +4850,6 @@ let
   indilib = callPackage ../development/libraries/indilib { };
 
   iniparser = callPackage ../development/libraries/iniparser { };
-
-  inteltbb = callPackage ../development/libraries/intel-tbb { };
 
   intltool = callPackage ../development/tools/misc/intltool { };
 
@@ -5137,6 +5144,8 @@ let
 
   libmhash = callPackage ../development/libraries/libmhash {};
 
+  libmodbus = callPackage ../development/libraries/libmodbus {};
+
   libmtp = callPackage ../development/libraries/libmtp { };
 
   libmsgpack = callPackage ../development/libraries/libmsgpack { };
@@ -5146,6 +5155,8 @@ let
   libnfsidmap = callPackage ../development/libraries/libnfsidmap { };
 
   libnice = callPackage ../development/libraries/libnice { };
+
+  liboping = callPackage ../development/libraries/liboping { };
 
   libplist = callPackage ../development/libraries/libplist { };
 
@@ -5485,6 +5496,8 @@ let
   });
 
   libxmlxx = callPackage ../development/libraries/libxmlxx { };
+
+  libxmp = callPackage ../development/libraries/libxmp { };
 
   libxslt = callPackage ../development/libraries/libxslt { };
 
@@ -6676,6 +6689,8 @@ let
 
   ngircd = callPackage ../servers/irc/ngircd { };
 
+  nsd = callPackage ../servers/dns/nsd { };
+
   opensmtpd = callPackage ../servers/mail/opensmtpd { };
 
   petidomo = callPackage ../servers/mail/petidomo { };
@@ -7053,7 +7068,12 @@ let
 
   hostapd = callPackage ../os-specific/linux/hostapd { };
 
-  htop = callPackage ../os-specific/linux/htop { };
+  htop =
+    if stdenv.isLinux then
+      callPackage ../os-specific/linux/htop { }
+    else if stdenv.isDarwin then
+      callPackage ../os-specific/darwin/htop { }
+    else null;
 
   # GNU/Hurd core packages.
   gnu = recurseIntoAttrs (callPackage ../os-specific/gnu {
@@ -7188,6 +7208,15 @@ let
   };
 
   linux_3_14 = makeOverridable (import ../os-specific/linux/kernel/linux-3.14.nix) {
+    inherit fetchurl stdenv perl buildLinux;
+    kernelPatches = lib.optionals ((platform.kernelArch or null) == "mips")
+      [ kernelPatches.mips_fpureg_emu
+        kernelPatches.mips_fpu_sigill
+        kernelPatches.mips_ext3_n32
+      ];
+  };
+
+  linux_3_15 = makeOverridable (import ../os-specific/linux/kernel/linux-3.15.nix) {
     inherit fetchurl stdenv perl buildLinux;
     kernelPatches = lib.optionals ((platform.kernelArch or null) == "mips")
       [ kernelPatches.mips_fpureg_emu
@@ -7335,8 +7364,8 @@ let
   linuxPackages = linuxPackages_3_12;
 
   # Update this when adding the newest kernel major version!
-  linux_latest = pkgs.linux_3_14;
-  linuxPackages_latest = pkgs.linuxPackages_3_14;
+  linux_latest = pkgs.linux_3_15;
+  linuxPackages_latest = pkgs.linuxPackages_3_15;
 
   # Build the kernel modules for the some of the kernels.
   linuxPackages_3_2 = recurseIntoAttrs (linuxPackagesFor pkgs.linux_3_2 linuxPackages_3_2);
@@ -7348,6 +7377,7 @@ let
   linuxPackages_3_12 = recurseIntoAttrs (linuxPackagesFor pkgs.linux_3_12 linuxPackages_3_12);
   linuxPackages_3_13 = recurseIntoAttrs (linuxPackagesFor pkgs.linux_3_13 linuxPackages_3_13);
   linuxPackages_3_14 = recurseIntoAttrs (linuxPackagesFor pkgs.linux_3_14 linuxPackages_3_14);
+  linuxPackages_3_15 = recurseIntoAttrs (linuxPackagesFor pkgs.linux_3_15 linuxPackages_3_15);
   linuxPackages_testing = recurseIntoAttrs (linuxPackagesFor pkgs.linux_testing linuxPackages_testing);
 
   # grsecurity flavors
@@ -7939,6 +7969,10 @@ let
   });
 
   arora = callPackage ../applications/networking/browsers/arora { };
+
+  atom = callPackage ../applications/editors/atom {
+    gconf = gnome.GConf;
+  };
 
   aseprite = callPackage ../applications/editors/aseprite {
     giflib = giflib_4_1;
@@ -8905,6 +8939,8 @@ let
     bison = bison2;
   };
 
+  llpp = callPackage ../applications/misc/llpp { inherit (ocamlPackages) lablgl; };
+
   lmms = callPackage ../applications/audio/lmms { };
 
   lxdvdrip = callPackage ../applications/video/lxdvdrip { };
@@ -9086,11 +9122,19 @@ let
     inherit gettext highline iconv locale lockfile rmail_sup
       text trollop unicode xapian_ruby which;
 
+    # See https://github.com/NixOS/nixpkgs/issues/1804 and
+    # https://github.com/NixOS/nixpkgs/issues/2146
+    bundler = pkgs.lib.overrideDerivation pkgs.rubyLibs.bundler (
+      oldAttrs: {
+        dontPatchShebangs = 1;
+      }
+    );
+
     chronic      = chronic_0_9_1;
     gpgme        = ruby_gpgme;
     mime_types   = mime_types_1_25;
     ncursesw_sup = ruby_ncursesw_sup;
-    rake         = rake_10_1_0;
+    rake         = rubyLibs.rake_10_1_0;
   };
 
   synfigstudio = callPackage ../applications/graphics/synfigstudio { };
@@ -9369,6 +9413,12 @@ let
     conf = config.st.conf or null;
   };
 
+  sweethome3d = recurseIntoAttrs (  (callPackage ../applications/misc/sweethome3d { })
+                                 // (callPackage ../applications/misc/sweethome3d/editors.nix {
+                                      sweethome3dApp = sweethome3d.application;
+                                    })
+                                 );
+
   sxiv = callPackage ../applications/graphics/sxiv { };
 
   bittorrentSync = callPackage ../applications/networking/bittorrentsync { };
@@ -9603,6 +9653,8 @@ let
   };
 
   vim = callPackage ../applications/editors/vim { };
+
+  macvim = callPackage ../applications/editors/vim/macvim.nix { };
 
   vimWrapper = wrapVim vim;
 
@@ -9853,6 +9905,8 @@ let
 
   xmove = callPackage ../applications/misc/xmove { };
 
+  xmp = callPackage ../applications/audio/xmp { };
+
   xnee = callPackage ../tools/X11/xnee {
     # Work around "missing separator" error.
     stdenv = overrideInStdenv stdenv [ gnumake381 ];
@@ -9950,7 +10004,7 @@ let
 
   crack_attack = callPackage ../games/crack-attack { };
 
-  crafty = callPackage ../games/crafty { fullVariant = false; };
+  crafty = callPackage ../games/crafty { };
   craftyFull = appendToName "full" (crafty.override { fullVariant = true; });
 
   crrcsim = callPackage ../games/crrcsim {};
@@ -10176,6 +10230,8 @@ let
   };
 
   trigger = callPackage ../games/trigger { };
+
+  typespeed = callPackage ../games/typespeed { };
 
   ufoai = callPackage ../games/ufoai { };
 
@@ -10615,6 +10671,11 @@ let
 
   picosat = callPackage ../applications/science/logic/picosat {};
 
+  prooftree = callPackage ../applications/science/logic/prooftree {
+    inherit (ocamlPackages) findlib lablgtk;
+    camlp5 = ocamlPackages.camlp5_transitional;
+  };
+
   prover9 = callPackage ../applications/science/logic/prover9 { };
 
   satallax = callPackage ../applications/science/logic/satallax {};
@@ -10627,7 +10688,7 @@ let
 
   tptp = callPackage ../applications/science/logic/tptp {};
 
-  verifast = callPackage_i686 ../applications/science/logic/verifast {};
+  verifast = callPackage ../applications/science/logic/verifast {};
 
   why3 = callPackage ../applications/science/logic/why3 {};
 
@@ -10782,6 +10843,8 @@ let
 
   fakenes = callPackage ../misc/emulators/fakenes { };
 
+  fceux = callPackage ../misc/emulators/fceux { };
+
   foldingathome = callPackage ../misc/foldingathome { };
 
   foo2zjs = callPackage ../misc/drivers/foo2zjs {};
@@ -10856,6 +10919,8 @@ let
   */
 
   nixops = callPackage ../tools/package-management/nixops { };
+
+  nix-prefetch-scripts = callPackage ../tools/package-management/nix-prefetch-scripts { };
 
   nix-repl = callPackage ../tools/package-management/nix-repl { };
 
@@ -10971,9 +11036,10 @@ let
   texFunctions = import ../tools/typesetting/tex/nix pkgs;
 
   texLive = builderDefsPackage (import ../tools/typesetting/tex/texlive) {
-    inherit builderDefs zlib bzip2 ncurses libpng ed lesstif ruby
+    inherit builderDefs zlib bzip2 ncurses libpng ed lesstif ruby potrace
       gd t1lib freetype icu perl expat curl xz pkgconfig zziplib texinfo
-      libjpeg bison python fontconfig flex poppler graphite2 makeWrapper;
+      libjpeg bison python fontconfig flex poppler libpaper graphite2
+      makeWrapper;
     inherit (xlibs) libXaw libX11 xproto libXt libXpm
       libXmu libXext xextproto libSM libICE;
     ghostscript = ghostscriptX;
