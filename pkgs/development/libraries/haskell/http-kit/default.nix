@@ -4,8 +4,8 @@
 
 cabal.mkDerivation (self: {
   pname = "http-kit";
-  version = "0.4.0";
-  sha256 = "0g7gc8faxibj0rhfasa6iaf7ikq4rs0428gca6mhaqp3zf8j7m8h";
+  version = "0.5.1";
+  sha256 = "1swnvsbaabk946pys9q9kr0bgdvalnznd59dw981sg7cywqdcz28";
   buildDepends = [ caseInsensitive httpTypes ];
   testDepends = [ hspec httpTypes QuickCheck quickcheckInstances ];
   meta = {

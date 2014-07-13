@@ -15,13 +15,13 @@
   # Older compilers inherit the overrides from newer ones.
 
   ghcHEADPrefs = self : super : super // {
-    cabalInstall_1_20_0_2 = super.cabalInstall_1_20_0_2.override { Cabal = null; };
+    cabalInstall_1_20_0_3 = super.cabalInstall_1_20_0_3.override { Cabal = null; };
     mtl = self.mtl_2_2_1;
     transformersCompat = super.transformersCompat_0_3_3;
   };
 
   ghc782Prefs = self : super : ghcHEADPrefs self super // {
-    cabalInstall_1_20_0_2 = super.cabalInstall_1_20_0_2.override { Cabal = self.Cabal_1_20_0_1; };
+    cabalInstall_1_20_0_3 = super.cabalInstall_1_20_0_3.override { Cabal = self.Cabal_1_20_0_1; };
     codex = super.codex.override { hackageDb = super.hackageDb.override { Cabal = self.Cabal_1_20_0_1; }; };
     mtl = self.mtl_2_1_2;
   };
@@ -40,8 +40,12 @@
     haddock = self.haddock_2_13_2;
     modularArithmetic = null;           # requires base >= 4.7
     pipesBinary = super.pipesBinary.override { binary = self.binary_0_7_2_1; };
+    rank1dynamic = super.rank1dynamic.override { binary = self.binary_0_7_2_1; };
+    distributedStatic = super.distributedStatic.override { binary = self.binary_0_7_2_1; };
+    networkTransport = super.networkTransport.override { binary = self.binary_0_7_2_1; };
+    distributedProcess = super.distributedProcess.override { binary = self.binary_0_7_2_1; };
     singletons = null;                  # requires base >= 4.7
-    vty_5_1_0 = super.vty_5_1_0.override { cabal = self.cabal.override { Cabal = self.Cabal_1_18_1_3; }; };
+    vty_5_1_1 = super.vty_5_1_1.override { cabal = self.cabal.override { Cabal = self.Cabal_1_18_1_3; }; };
     transformers = self.transformers_0_3_0_0; # core packagen in ghc > 7.6.x
     zipArchive = super.zipArchive_0_2_2_1;    # works without binary 0.7.x
   };

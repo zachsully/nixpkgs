@@ -4,20 +4,19 @@
 , exceptions, extensibleExceptions, fdoNotify, feed, filepath, git
 , gnupg1, gnutls, hamlet, hinotify, hS3, hslogger, HTTP, httpClient
 , httpConduit, httpTypes, IfElse, json, liftedBase, lsof, MissingH
-, monadControl, mtl, network, networkConduit, networkInfo
-, networkMulticast, networkProtocolXmpp, openssh
-, optparseApplicative, perl, QuickCheck, random, regexTdfa, rsync
-, SafeSemaphore, securemem, SHA, shakespeare, stm, tasty
-, tastyHunit, tastyQuickcheck, tastyRerun, text, time, transformers
-, unixCompat, utf8String, uuid, wai, waiLogger, warp, warpTls
-, which, xmlTypes, yesod, yesodCore, yesodDefault, yesodForm
-, yesodStatic, fsnotify
+, monadControl, mtl, network, networkInfo, networkMulticast
+, networkProtocolXmpp, openssh, optparseApplicative, perl
+, QuickCheck, random, regexTdfa, rsync, SafeSemaphore, securemem
+, SHA, shakespeare, stm, tasty, tastyHunit, tastyQuickcheck
+, tastyRerun, text, time, transformers, unixCompat, utf8String
+, uuid, wai, waiExtra, warp, warpTls, which, xmlTypes, yesod
+, yesodCore, yesodDefault, yesodForm, yesodStatic, fsnotify
 }:
 
 cabal.mkDerivation (self: {
   pname = "git-annex";
-  version = "5.20140606";
-  sha256 = "1b9hslkdv82lf8njwzy51yj8dgg2wn7g08wy73lk7pnddfh8qjpy";
+  version = "5.20140707";
+  sha256 = "1m78125w6mq532ngfksrwj3s43qj7wyp756f6qxcqg1cl71xh34k";
   isLibrary = false;
   isExecutable = true;
   buildDepends = [
@@ -26,14 +25,17 @@ cabal.mkDerivation (self: {
     dlist dns editDistance exceptions extensibleExceptions
     feed filepath gnutls hamlet hS3 hslogger HTTP httpClient
     httpConduit httpTypes IfElse json liftedBase MissingH monadControl
-    mtl network networkConduit networkInfo networkMulticast
-    networkProtocolXmpp optparseApplicative QuickCheck random regexTdfa
-    SafeSemaphore securemem SHA shakespeare stm tasty tastyHunit
-    tastyQuickcheck tastyRerun text time transformers unixCompat
-    utf8String uuid wai waiLogger warp warpTls xmlTypes yesod yesodCore
-    yesodDefault yesodForm yesodStatic
-  ] ++ (if !self.stdenv.isDarwin
-        then [ dbus fdoNotify hinotify ] else [ fsnotify ]);
+    mtl network networkInfo networkMulticast networkProtocolXmpp
+    optparseApplicative QuickCheck random regexTdfa SafeSemaphore
+    securemem SHA shakespeare stm tasty tastyHunit tastyQuickcheck
+    tastyRerun text time transformers unixCompat utf8String uuid wai
+    waiExtra warp warpTls xmlTypes yesod yesodCore yesodDefault
+    yesodForm yesodStatic
+  ] ++ (if (!self.stdenv.isDarwin) then [
+    dbus fdoNotify hinotify
+  ] else [
+    fsnotify
+  ]);
   buildTools = [ bup curl git gnupg1 lsof openssh perl rsync which ];
   configureFlags = "-fAssistant -fProduction";
   preConfigure = ''

@@ -11,6 +11,7 @@ cabal.mkDerivation (self: {
     HUnit QuickCheck testFramework testFrameworkHunit
     testFrameworkQuickcheck2
   ];
+  jailbreak = true;
   meta = {
     homepage = "https://github.com/RobotGymnast/extensible-effects";
     description = "An Alternative to Monad Transformers";
