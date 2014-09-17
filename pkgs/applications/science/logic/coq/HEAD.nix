@@ -3,7 +3,7 @@
 {stdenv, fetchgit, pkgconfig, ocaml, findlib, camlp5, ncurses, lablgtk ? null}:
 
 let 
-  version = "8.5pre-8bc01590";
+  version = "8.5pre-fbbb86b";
   buildIde = lablgtk != null;
   ideFlags = if buildIde then "-lablgtkdir ${lablgtk}/lib/ocaml/*/site-lib/lablgtk2 -coqide opt" else "";
   idePath = if buildIde then ''
@@ -16,17 +16,20 @@ stdenv.mkDerivation {
 
   src = fetchgit {
     url = git://scm.gforge.inria.fr/coq/coq.git;
-    rev = "8bc0159095cb0230a50c55a1611c8b77134a6060";
-    sha256 = "1cp4hbk9jw78y03vwz099yvixax161h60hsbyvwiwz2z5czjxzcv";
+    rev = "f7c6b864a509a4cca11cac5fbd5d37efc";
+    sha256 = "0v84pjxx361afkipgwkc4d2wmn7v1c5n2y8d264kc26i58cgrrf4";
   };
 
   buildInputs = [ pkgconfig ocaml findlib camlp5 ncurses lablgtk ];
+
+  patches = [ ./no-codesign.patch ];
 
   postPatch = ''
     UNAME=$(type -tp uname)
     RM=$(type -tp rm)
     substituteInPlace configure --replace "/bin/uname" "$UNAME"
     substituteInPlace tools/beautify-archive --replace "/bin/rm" "$RM"
+    substituteInPlace Makefile.build --replace "ifeq (\$(ARCH),Darwin)" "ifeq (\$(ARCH),Darwinx)"
   '';
 
   preConfigure = ''
