@@ -60,7 +60,7 @@ let
   };
 
 in stdenv.mkDerivation {
-  name = "chromium-${channel}-${chromium.browser.version}";
+  name = "chromium${if channel != "stable" then "-" + channel else ""}-${chromium.browser.version}";
 
   buildInputs = [ makeWrapper ];
 
@@ -75,6 +75,7 @@ in stdenv.mkDerivation {
       --set CHROMIUM_SANDBOX_BINARY_PATH "${sandboxBinary}" \
       --add-flags "${chromium.plugins.flagsEnabled}"
 
+    ln -s "$out/bin/chromium" "$out/bin/chromium-browser"
     ln -s "${chromium.browser}/share/icons" "$out/share/icons"
     cp -v "${desktopItem}/share/applications/"* "$out/share/applications"
   '';

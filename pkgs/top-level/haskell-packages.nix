@@ -269,6 +269,8 @@ self :
 
   bktrees = callPackage ../development/libraries/haskell/bktrees {};
 
+  blankCanvas = callPackage ../development/libraries/haskell/blank-canvas {};
+
   blazeBuilder = callPackage ../development/libraries/haskell/blaze-builder {};
 
   blazeBuilderConduit = callPackage ../development/libraries/haskell/blaze-builder-conduit {};
@@ -289,9 +291,7 @@ self :
 
   bloomfilter = callPackage ../development/libraries/haskell/bloomfilter {};
 
-  bmp = callPackage ../development/libraries/haskell/bmp {
-    binary = self.binary_0_7_2_1;
-  };
+  bmp = callPackage ../development/libraries/haskell/bmp {};
 
   Boolean = callPackage ../development/libraries/haskell/Boolean {};
 
@@ -462,6 +462,8 @@ self :
   compdata = if (pkgs.stdenv.lib.versionOlder "7.8" ghc.version)
                then callPackage ../development/libraries/haskell/compdata {}
                else null;
+
+  compdataParam = callPackage ../development/libraries/haskell/compdata-param {};
 
   composition = callPackage ../development/libraries/haskell/composition {};
 
@@ -904,13 +906,13 @@ self :
 
   ghcjsCodemirror = callPackage ../development/libraries/haskell/ghcjs-codemirror {};
 
-  ghcMod_4_1_6 = callPackage ../development/libraries/haskell/ghc-mod/4.1.6.nix { inherit (pkgs) emacs; };
-  ghcMod_5_0_1_2 = callPackage ../development/libraries/haskell/ghc-mod/5.0.1.2.nix { inherit (pkgs) emacs; };
-  ghcMod = self.ghcMod_4_1_6;
+  ghcMod = callPackage ../development/libraries/haskell/ghc-mod { inherit (pkgs) emacs; };
 
   ghcMtl = callPackage ../development/libraries/haskell/ghc-mtl {};
 
   ghcPaths = callPackage ../development/libraries/haskell/ghc-paths {};
+
+  ghcParser = callPackage ../development/libraries/haskell/ghc-parser {};
 
   ghcSyb = callPackage ../development/libraries/haskell/ghc-syb {};
 
@@ -1018,6 +1020,8 @@ self :
 
   Graphalyze = callPackage ../development/libraries/haskell/Graphalyze {};
 
+  graphmod = callPackage ../development/tools/haskell/graphmod {};
+
   graphviz = callPackage ../development/libraries/haskell/graphviz {};
 
   graphSCC = callPackage ../development/libraries/haskell/graphscc {};
@@ -1101,9 +1105,9 @@ self :
 
   hedis = callPackage ../development/libraries/haskell/hedis {};
 
-  here = callPackage ../development/libraries/haskell/here {};
-
   heredoc = callPackage ../development/libraries/haskell/heredoc {};
+
+  here = callPackage ../development/libraries/haskell/here {};
 
   hexpat = callPackage ../development/libraries/haskell/hexpat {};
 
@@ -1347,6 +1351,8 @@ self :
 
   ieee754 = callPackage ../development/libraries/haskell/ieee754 {};
 
+  ihaskell = callPackage ../development/tools/haskell/ihaskell {};
+
   imm = callPackage ../development/libraries/haskell/imm {};
 
   implicit = callPackage ../development/libraries/haskell/implicit {
@@ -1426,7 +1432,11 @@ self :
 
   JuicyPixelsUtil = callPackage ../development/libraries/haskell/JuicyPixels-util {};
 
+  jwt = callPackage ../development/libraries/haskell/jwt {};
+
   kanExtensions = callPackage ../development/libraries/haskell/kan-extensions {};
+
+  kansasComet = callPackage ../development/libraries/haskell/kansas-comet {};
 
   kansasLava = callPackage ../development/libraries/haskell/kansas-lava {};
 
@@ -1444,7 +1454,9 @@ self :
 
   languageGlsl = callPackage ../development/libraries/haskell/language-glsl {};
 
-  languageJava = callPackage ../development/libraries/haskell/language-java {};
+  languageJava_0_2_6 = callPackage ../development/libraries/haskell/language-java/0.2.6.nix {};
+  languageJava_0_2_7 = callPackage ../development/libraries/haskell/language-java/0.2.7.nix {};
+  languageJava = self.languageJava_0_2_7;
 
   languageJavascript = callPackage ../development/libraries/haskell/language-javascript {};
 
@@ -1488,7 +1500,11 @@ self :
 
   libjenkins = callPackage ../development/libraries/haskell/libjenkins {};
 
-  libmpd = callPackage ../development/libraries/haskell/libmpd {};
+  libmpd_0_8_0_5 = callPackage ../development/libraries/haskell/libmpd/0.8.0.5.nix {};
+
+  libmpd_0_9_0_1 = callPackage ../development/libraries/haskell/libmpd/0.9.0.1.nix {};
+
+  libmpd = self.libmpd_0_9_0_1;
 
   liblastfm = callPackage ../development/libraries/haskell/liblastfm {};
 
@@ -1573,6 +1589,8 @@ self :
   meep = callPackage ../development/libraries/haskell/meep {};
 
   MemoTrie = callPackage ../development/libraries/haskell/MemoTrie {};
+
+  mersenneRandom = callPackage ../development/libraries/haskell/mersenne-random {};
 
   mersenneRandomPure64 = callPackage ../development/libraries/haskell/mersenne-random-pure64 {};
 
@@ -2203,7 +2221,6 @@ self :
 
   setlocale = callPackage ../development/libraries/haskell/setlocale {};
 
-
   shellish = callPackage ../development/libraries/haskell/shellish {};
 
   shellmate = callPackage ../development/libraries/haskell/shellmate {};
@@ -2211,6 +2228,8 @@ self :
   shelly_0_15_4_1 = callPackage ../development/libraries/haskell/shelly/0.15.4.1.nix {};
   shelly_1_5_3_1 = callPackage ../development/libraries/haskell/shelly {};
   shelly = self.shelly_1_5_3_1;
+
+  shell-conduit = callPackage ../development/libraries/haskell/shell-conduit {};
 
   simpleConduit = callPackage ../development/libraries/haskell/simple-conduit {};
 
@@ -2338,6 +2357,10 @@ self :
     inherit (pkgs) SDL;
   };
 
+  sdl2 = callPackage ../development/libraries/haskell/sdl2 {
+    inherit (pkgs) SDL2;
+  };
+
   SHA = callPackage ../development/libraries/haskell/SHA {};
 
   SHA2 = callPackage ../development/libraries/haskell/SHA2 {};
@@ -2416,6 +2439,8 @@ self :
 
   symbol = callPackage ../development/libraries/haskell/symbol {};
 
+  systemArgv0 = callPackage ../development/libraries/haskell/system-argv0 {};
+
   systemFilepath = callPackage ../development/libraries/haskell/system-filepath {};
 
   systemFileio = callPackage ../development/libraries/haskell/system-fileio {};
@@ -2453,6 +2478,8 @@ self :
   tastyHspec = callPackage ../development/libraries/haskell/tasty-hspec {};
 
   tastyHunit = callPackage ../development/libraries/haskell/tasty-hunit {};
+
+  tastyProgram = callPackage ../development/libraries/haskell/tasty-program {};
 
   tastyQuickcheck = callPackage ../development/libraries/haskell/tasty-quickcheck {};
 
@@ -2708,8 +2735,8 @@ self :
   void = callPackage ../development/libraries/haskell/void {};
 
   vty_4_7_5 = callPackage ../development/libraries/haskell/vty/4.7.5.nix {};
-  vty_5_2_1 = callPackage ../development/libraries/haskell/vty/5.2.1.nix {};
-  vty = self.vty_5_2_1;
+  vty_5_2_2 = callPackage ../development/libraries/haskell/vty/5.2.2.nix {};
+  vty = self.vty_5_2_2;
 
   vtyUi = callPackage ../development/libraries/haskell/vty-ui {
     vty = self.vty_4_7_5;
@@ -2751,10 +2778,7 @@ self :
 
   webRoutesBoomerang = callPackage ../development/libraries/haskell/web-routes-boomerang {};
 
-  websockets = callPackage ../development/libraries/haskell/websockets {
-    testFrameworkQuickcheck2 = self.testFrameworkQuickcheck2.override { QuickCheck = self.QuickCheck_2_6; };
-    QuickCheck = self.QuickCheck_2_6;
-  };
+  websockets = callPackage ../development/libraries/haskell/websockets {};
 
   websocketsSnap = callPackage ../development/libraries/haskell/websockets-snap {};
 
@@ -3015,6 +3039,7 @@ self :
   idris_plain = callPackage ../development/compilers/idris {
     llvmGeneral = self.llvmGeneral_3_3_8_2;
     llvmGeneralPure = self.llvmGeneralPure_3_3_8_2;
+    languageJava = self.languageJava_0_2_6;
   };
 
   idris = callPackage ../development/compilers/idris/wrapper.nix {};
@@ -3035,7 +3060,9 @@ self :
 
   xlsx = callPackage ../development/libraries/haskell/xlsx {};
 
-  xmobar = callPackage ../applications/misc/xmobar {};
+  xmobar = callPackage ../applications/misc/xmobar {
+    libmpd = self.libmpd_0_8_0_5;
+  };
 
   xmonad = callPackage ../applications/window-managers/xmonad {};
 
@@ -3094,6 +3121,8 @@ self :
 
   cabalGhci = callPackage ../development/tools/haskell/cabal-ghci {};
 
+  cabalg = callPackage ../development/libraries/haskell/cabalg {};
+
   cabalInstall_0_6_2  = callPackage ../tools/package-management/cabal-install/0.6.2.nix {};
   cabalInstall_0_8_0  = callPackage ../tools/package-management/cabal-install/0.8.0.nix {};
   cabalInstall_0_8_2  = callPackage ../tools/package-management/cabal-install/0.8.2.nix {};
@@ -3108,7 +3137,11 @@ self :
 
   commandQq = callPackage ../development/libraries/haskell/command-qq {};
 
-  gitAnnex = callPackage ../applications/version-management/git-and-tools/git-annex {};
+  escoger = callPackage ../tools/misc/escoger { };
+
+  gitAnnex = callPackage ../applications/version-management/git-and-tools/git-annex {
+    cabal = self.cabal.override { extension = self : super : { enableSharedExecutables = false; }; };
+  };
 
   githubBackup = callPackage ../applications/version-management/git-and-tools/github-backup {};
 
