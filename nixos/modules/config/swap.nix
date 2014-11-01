@@ -126,7 +126,7 @@ with lib;
             serviceConfig.Type = "oneshot";
           };
 
-      in listToAttrs (map createSwapDevice (filter (sw: sw.name != null && sw.size != null) config.swapDevices));
+      in listToAttrs (map createSwapDevice (filter (sw: sw.device != null && sw.size != null) config.swapDevices));
 
   };
 
