@@ -20,8 +20,9 @@ with lib;
         The swap devices and swap files.  These must have been
         initialised using <command>mkswap</command>.  Each element
         should be an attribute set specifying either the path of the
-        swap device or file (<literal>device</literal>) or the label
-        of the swap device (<literal>label</literal>, see
+        swap device or file (<literal>device</literal>), the device
+        from the storage configuration (<option>storage.*</option>) or
+        the label of the swap device (<literal>label</literal>, see
         <command>mkswap -L</command>).  Using a label is
         recommended.
       '';
@@ -34,8 +35,18 @@ with lib;
 
           device = mkOption {
             example = "/dev/sda3";
-            type = types.str;
+            type = types.nullOr types.str;
             description = "Path of the device.";
+          };
+
+          storage = mkOption {
+            default = null;
+            example = "partition.swap";
+            type = types.nullOr types.str;
+            description = ''
+              Storage device from <option>storage.*</option> to use for
+              this swap device.
+            '';
           };
 
           label = mkOption {
@@ -72,7 +83,7 @@ with lib;
         };
 
         config = {
-          device = mkIf options.label.isDefined
+          device = mkIf (options.label.isDefined && config.storage != null)
             "/dev/disk/by-label/${config.label}";
         };
 
@@ -115,7 +126,7 @@ with lib;
             serviceConfig.Type = "oneshot";
           };
 
-      in listToAttrs (map createSwapDevice (filter (sw: sw.size != null) config.swapDevices));
+      in listToAttrs (map createSwapDevice (filter (sw: sw.name != null && sw.size != null) config.swapDevices));
 
   };
 
