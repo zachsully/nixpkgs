@@ -16,11 +16,11 @@ let
   };
 in stdenv.mkDerivation rec {
   name = "atom-${version}";
-  version = "0.129.0";
+  version = "0.139.0";
 
   src = fetchurl {
     url = "https://github.com/atom/atom/releases/download/v${version}/atom-amd64.deb";
-    sha256 = "0a78cb7e74b75b5c1cdbdfdea3f56ecab9479e407575b1e3cfb10c0d3265e7a4";
+    sha256 = "0732s4r9qx0sgsnz415z5r9685scly2084q80kz2xw0d2gfx04xr";
     name = "${name}.deb";
   };
 

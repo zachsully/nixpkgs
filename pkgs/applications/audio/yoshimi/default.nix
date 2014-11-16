@@ -6,15 +6,15 @@ assert stdenv ? glibc;
 
 stdenv.mkDerivation  rec {
   name = "yoshimi-${version}";
-  version = "1.2.3";
+  version = "1.2.5";
 
   src = fetchurl {
     url = "mirror://sourceforge/yoshimi/${name}.tar.bz2";
-    sha256 = "00bp699k8gnilin2rvgj35334s9jrizp82qwlmzzvvfliwcgqlqw";
+    sha256 = "0lixrxv0wds3p50kmy9k166qhavdjkhlxs432s248hk43k7n6c1h";
   };
 
   buildInputs = [
-    alsaLib boost boost.lib cairo fftwSinglePrec fltk jack2 libsndfile mesa
+    alsaLib boost cairo fftwSinglePrec fltk jack2 libsndfile mesa
     minixml zlib xorg.libpthreadstubs
   ];
 

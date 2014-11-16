@@ -10,15 +10,19 @@ let
 
   systemd = cfg.package;
 
+
   makeUnit = name: unit:
+    let
+      pathSafeName = lib.replaceChars ["@" "\\"] ["-" "-"] name;
+    in
     if unit.enable then
-      pkgs.runCommand "unit" { preferLocalBuild = true; inherit (unit) text; }
+      pkgs.runCommand "unit-${pathSafeName}" { preferLocalBuild = true; inherit (unit) text; }
         ''
           mkdir -p $out
           echo -n "$text" > $out/${shellEscape name}
         ''
     else
-      pkgs.runCommand "unit" { preferLocalBuild = true; }
+      pkgs.runCommand "unit-${pathSafeName}-disabled" { preferLocalBuild = true; }
         ''
           mkdir -p $out
           ln -s /dev/null $out/${shellEscape name}
@@ -81,6 +85,7 @@ let
       "systemd-journal-flush.service"
       "systemd-journal-gatewayd.socket"
       "systemd-journal-gatewayd.service"
+      "systemd-journald-dev-log.socket"
       "syslog.socket"
 
       # SysV init compatibility.
@@ -321,7 +326,7 @@ let
           [Service]
           ${let env = cfg.globalEnvironment // def.environment;
             in concatMapStrings (n:
-              let s = "Environment=\"${n}=${getAttr n env}\"\n";
+              let s = "Environment=\"${n}=${env.${n}}\"\n";
               in if stringLength s >= 2048 then throw "The value of the environment variable ‘${n}’ in systemd service ‘${name}.service’ is too long." else s) (attrNames env)}
           ${if def.reloadIfChanged then ''
             X-ReloadIfChanged=true

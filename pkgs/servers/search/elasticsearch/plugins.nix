@@ -4,11 +4,11 @@ with pkgs.lib;
 
 let
   esPlugin = a@{
-    pluginName, 
+    pluginName,
     installPhase ? ''
-      mkdir -p $out
+      mkdir -p $out/bin
       ES_HOME=$out ${elasticsearch}/bin/elasticsearch-plugin --install ${pluginName} --url file://$src
-    '', 
+    '',
     ...
   }:
     stdenv.mkDerivation (a // {
@@ -23,11 +23,11 @@ let
 in {
   elasticsearch_river_jdbc = esPlugin rec {
     name = "elasticsearch-river-jdbc-${version}";
-    pluginName = "jdbc";
-    version = "1.2.1.1";
+    pluginName = "elasticsearch-river-jdbc";
+    version = "1.3.0.4";
     src = fetchurl {
       url = "http://xbib.org/repository/org/xbib/elasticsearch/plugin/elasticsearch-river-jdbc/${version}/${name}-plugin.zip";
-      sha1 = "68e7e1fdf45d0e5852b21610a84740595223ea11";
+      sha256 = "0272l6cr032iccwwa803shzfjg3505jc48d9qdazrwxjmnlkkzqk";
     };
     meta = {
       homepage = "https://github.com/jprante/elasticsearch-river-jdbc";
@@ -69,5 +69,26 @@ in {
       license = licenses.mit;
       platforms = elasticsearch.meta.platforms;
     };
+  };
+
+  elasticsearch_river_twitter = esPlugin rec {
+    name = pname + "-" + version;
+    pname = "elasticsearch-river-twitter";
+    pluginName = "elasticsearch/" + pname + "/" + version;
+    version = "2.3.0";
+
+    src = fetchurl {
+      url = "http://download.elasticsearch.org/elasticsearch/${pname}/${name}.zip";
+      sha256 = "1lxxh1r61r15mzqyl0li37kcnn3vvpklnbfyys0kd6a1l82f0qvj";
+    };
+
+    meta = {
+      homepage = "https://github.com/elasticsearch/elasticsearch-river-twitter";
+      description = "Twitter River Plugin for ElasticSearch";
+      license = licenses.asl20;
+      maintainers = [ maintainers.edwtjo ];
+      platforms = elasticsearch.meta.platforms;
+    };
+
   };
 }

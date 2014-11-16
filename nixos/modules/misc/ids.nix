@@ -154,6 +154,11 @@
       collectd = 144;
       consul = 145;
       mailpile = 146;
+      redmine = 147;
+      seeks = 148;
+      prosody = 149;
+      i2pd = 150;
+      dnscrypt-proxy = 151;
 
       # When adding a uid, make sure it doesn't match an existing gid. And don't use uids above 399!
 
@@ -275,6 +280,10 @@
       riemanndash = 138;
       uhub = 142;
       mailpile = 146;
+      redmine = 147;
+      seeks = 148;
+      prosody = 149;
+      i2pd = 150;
 
       # When adding a gid, make sure it doesn't match an existing uid. And don't use gids above 399!
 

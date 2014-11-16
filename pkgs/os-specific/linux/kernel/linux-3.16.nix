@@ -1,12 +1,12 @@
 { stdenv, fetchurl, ... } @ args:
 
 import ./generic.nix (args // rec {
-  version = "3.16.3";
+  version = "3.16.7";
   extraMeta.branch = "3.16";
 
   src = fetchurl {
     url = "mirror://kernel/linux/kernel/v3.x/linux-${version}.tar.xz";
-    sha256 = "1namhqsfr26pjwhrxh8agybdjk14337yyn6h12294dazjd7s74ak";
+    sha256 = "0vm3ahw6wzq72z6jim05pcj9gzjw8jc4r1dr5wnfl810nib89pbk";
   };
 
   features.iwlwifi = true;

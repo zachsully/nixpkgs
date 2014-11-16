@@ -9,15 +9,15 @@
 with lib;
 
 stdenv.mkDerivation rec {
-  name = "blender-2.71";
+  name = "blender-2.72b";
 
   src = fetchurl {
     url = "http://download.blender.org/source/${name}.tar.gz";
-    sha256 = "12aqdrpl86xjk2xdwj2nbfcmdzyv61n443gw6j2japffm1kmlz8x";
+    sha256 = "0ixz8h3c08p4f84x8r85nzddwvc0h5lw1ci8gdg2x3m2mw2cfdj4";
   };
 
   buildInputs =
-    [ SDL boost boost.lib cmake ffmpeg gettext glew ilmbase libXi
+    [ SDL boost cmake ffmpeg gettext glew ilmbase libXi
       libjpeg libpng libsamplerate libsndfile libtiff mesa openal
       opencolorio openexr openimageio /* openjpeg */ python zlib fftw
     ]
@@ -30,8 +30,7 @@ stdenv.mkDerivation rec {
     '';
 
   cmakeFlags =
-    [ "-DOPENEXR_INC=${openexr}/include/OpenEXR"
-      "-DWITH_OPENCOLLADA=OFF"
+    [ "-DWITH_OPENCOLLADA=OFF"
       "-DWITH_MOD_OCEANSIM=ON"
       "-DWITH_CODEC_FFMPEG=ON"
       "-DWITH_CODEC_SNDFILE=ON"
