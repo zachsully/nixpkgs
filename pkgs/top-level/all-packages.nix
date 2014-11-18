@@ -11925,6 +11925,9 @@ let
 
   mate-themes = callPackage ../misc/themes/mate-themes { };
 
+  plasma5_latest = plasma51;
+  plasma51 = recurseIntoAttrs (callPackage ../desktops/plasma-5.1 {});
+
   xfce = xfce4_10;
   xfce4_10 = recurseIntoAttrs (import ../desktops/xfce { inherit config pkgs newScope; });
 
