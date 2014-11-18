@@ -159,6 +159,7 @@ in
         pkgs.kde4.konsole
         pkgs.kde4.oxygen_icons
         pkgs.hicolor_icon_theme
+        pkgs.orion
       ]
       ++ (optional config.networking.networkmanager.enable plasma-nm)
       ++ phononBackendPackages;
