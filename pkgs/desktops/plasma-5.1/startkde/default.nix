@@ -23,6 +23,6 @@ stdenv.mkDerivation {
   meta = {
     description = "Custom startkde script for Nixpkgs";
     maintainers = with stdenv.lib.maintainers; [ ttuegel ];
-    license = with stdenv.lib.licenses; [ gpl21Plus ];
+    license = with stdenv.lib.licenses; [ gpl2Plus ];
   };
 }
