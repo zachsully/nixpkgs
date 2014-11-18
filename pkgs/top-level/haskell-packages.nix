@@ -218,6 +218,8 @@ self : let callPackage = x : y : modifyPrio (newScope self x y); in
 
   authenticateOauth = callPackage ../development/libraries/haskell/authenticate-oauth {};
 
+  autonixDeps = callPackage ../development/libraries/haskell/autonix-deps {};
+
   base16Bytestring = callPackage ../development/libraries/haskell/base16-bytestring {};
 
   base32Bytestring = callPackage ../development/libraries/haskell/base32-bytestring {};
