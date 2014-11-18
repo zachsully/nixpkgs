@@ -1,0 +1,233 @@
+{ callPackage, fetchurl, haskellPackages, newScope, runCommand, stdenv, writeText }:
+
+with stdenv.lib;
+
+let
+  traceThis = x: builtins.trace x x;
+  pkgNameVersion = pkg: nameFromURL pkg.name ".tar";
+  pkgAttrName = pkg: (builtins.parseDrvName (pkgNameVersion pkg)).name;
+  pkgVersion = pkg: (builtins.parseDrvName (pkgNameVersion pkg)).version;
+
+  manifestWithNames = manifest:
+    builtins.listToAttrs (map (p: nameValuePair (pkgAttrName p) p) manifest);
+
+  generateSources =
+    mapAttrs (n: pkg: fetchurl { inherit (pkg) sha256 name url; });
+
+  generateStores = mapAttrs (n: pkg: pkg.store);
+
+  oneList = x: if builtins.isList x then x else [x];
+
+  resolveInputs = collection: extra: names: inputs:
+    concatMap
+      (input: oneList (
+        if names ? "${input}"
+          then names."${input}"
+        else if extra ? "${input}"
+          then extra."${input}"
+        else if collection ? "${input}"
+          then collection."${input}"
+        else []
+      ))
+      inputs;
+
+  manifestXML = manifest:
+    writeText "manifest.xml" (builtins.toXML (generateStores manifest));
+
+  breakRecursion = mapAttrs (name: mapAttrs (depType: filter (x: x != name)));
+
+  mkDerivation = args: attrs:
+    stdenv.mkDerivation (mergeAttrsByFuncDefaultsClean (attrs ++ [args]));
+
+  unique =
+    let go = xs: x: xs ++ optional (!(elem x xs)) x;
+    in foldl go [];
+
+  uniqueNames = manifest:
+    unique (map pkgAttrName manifest);
+
+  versionsOf = manifest: name:
+    filter (pkg: pkgAttrName pkg == name) manifest;
+
+  bestVersion = versions:
+    let
+      strictLess = a: b:
+        builtins.compareVersions (pkgVersion a) (pkgVersion b) > 0;
+      sorted = sort strictLess versions;
+    in head sorted;
+
+  filterManifest = manifest:
+    map (name: bestVersion (versionsOf manifest name)) (uniqueNames manifest);
+
+  # sane defaults (same name as attr name so that inherit can be used)
+  mergeAttrBy = # { buildInputs = concatList; [...]; passthru = mergeAttr; [..]; }
+    listToAttrs (map (n : nameValuePair n concat)
+      # Lists to concat
+      [ "nativeBuildInputs"
+        "buildInputs"
+        "propagatedBuildInputs"
+        "propagatedNativeBuildInputs"
+        "cmakeFlags"
+        "configureFlags"
+        "prePhases"
+        "postAll"
+        "patches"
+      ])
+    // listToAttrs (map (n : nameValuePair n mergeAttrs)
+      # Attribute sets to merge
+      [ "passthru"
+        "meta"
+        "cfg"
+        "flags"
+      ])
+    // listToAttrs (map (n : nameValuePair n (a: b: "${a}\n${b}"))
+      # Strings to concat, separated by a newline
+      [ "preConfigure"
+        "postInstall"
+      ]);
+
+  mergeAttrsByFuncDefaults = foldl mergeAttrByFunc { inherit mergeAttrBy; };
+  mergeAttrsByFuncDefaultsClean = list: removeAttrs (mergeAttrsByFuncDefaults list) ["mergeAttrBy"];
+
+  callAutonixPackage =
+    { manifest
+    , dependencies
+    , srcs
+    , overrides
+    , resolve
+    , callPackage
+    , deriver
+    }: dir: attrName: extra:
+    let
+      pkg = getAttr attrName manifest;
+      pkgOverrides = maybeAttr attrName {} overrides;
+      pkgDeps = getAttr attrName dependencies;
+      defaultDrvAttrs = {
+        name = nameFromURL pkg.name ".tar";
+        src = getAttr attrName srcs;
+        buildInputs = resolve pkgDeps.buildInputs;
+        nativeBuildInputs = resolve pkgDeps.nativeBuildInputs;
+        propagatedBuildInputs = resolve pkgDeps.propagatedBuildInputs;
+        propagatedNativeBuildInputs =
+          resolve pkgDeps.propagatedNativeBuildInputs;
+        propagatedUserEnvPkgs = resolve pkgDeps.propagatedUserEnvPkgs;
+        enableParallelBuilding = true;
+      };
+      drv =
+        let attrs = [ defaultDrvAttrs pkgOverrides ];
+            exprPath = dir + ("/" + attrName + "/default.nix");
+        in if builtins.pathExists exprPath
+          then (callPackage exprPath extra) attrs
+        else deriver extra attrs;
+    in drv;
+
+in
+{
+  inherit pkgNameVersion pkgAttrName packagesOnly deps;
+  inherit manifestWithNames generateSources resolveInputs manifestXML;
+  inherit filterManifest mergeAttrsBy mergeAttrsByFuncDefaults;
+  inherit mergeAttrsByFuncDefaultsClean callAutonixPackage;
+
+  emptyDeps = {
+    buildInputs = [];
+    nativeBuildInputs = [];
+    propagatedBuildInputs = [];
+    propagatedNativeBuildInputs = [];
+    propagatedUserEnvPkgs = [];
+  };
+
+  generateCollection = dir:
+    /* names maps dependency strings to derivations. It is a set of the form:
+     * {
+     *   <dependency name> = <derivation>
+     * }
+     */
+    { names
+    /* manifest lists the packages in the collection, their source and hash
+     * information. It is a list of the form:
+     * [
+     *   {
+     *     url = <src url>;
+     *     sha256 = <hash>;
+     *     name = <basename of src>;
+     *     store = <store path of downloaded src>;
+     *   }
+     *   ...
+     * ]
+     * The package name is determined from the (sanitized) source name. This
+     * is usually generated by ./manifest.sh
+     */
+    , manifest
+    /* dependencies is a set of the form:
+     * {
+     *   <package attr name> = {
+     *     buildInputs = [ <list of strings> ];
+     *     nativeBuildInputs = [ <list of strings> ];
+     *     propagatedBuildInputs = [ <list of strings> ];
+     *     propagatedNativeBuildInputs = [ <list of strings> ];
+     *     propagatedUserEnvPkgs = [ <list of strings> ];
+     *   };
+     *   ...
+     * }
+     * Each list of strings will be translated into dependencies using the
+     * names argument. Every list must be present for each package, even if
+     * it is just the empty list.
+     */
+    , dependencies
+    /* extraInputs are attributes in the default scope (through callPackage) to
+     * the expressions in the collection. They are not included in the final
+     * set.
+     */
+    , extraInputs ? {}
+    /* extraOutputs are extra attributes to include in the final set of the
+     * collection. They are also used as extraInputs, so there is no need to
+     * list packages twice.
+     */
+    , extraOutputs ? {}
+    /* deriver is a function of two arguments. The first argument is an
+     * attribute set of the form passed to stdenv.mkDerivation; these are the
+     * default derivation attributes. The second argument is a list of attribute
+     * sets which should be merged to produce additional arguments for the
+     * derivation. The first arguments should override the merge arguments.
+     */
+    , deriver ? mkDerivation
+    /* overrides is a set of extra attributes passed to the deriver for each
+     * package, i.e., it is a set of the form:
+     * {
+     *    <package name> = { <extra attributes> };
+     * }
+     * The extra attributes can be any extra attributes for the deriver, such
+     * as buildInputs, cmakeFlags, etc. They will be merged with attributes from
+     * other sources.
+     */
+    , overrides ? {}
+    }:
+    let dependenciesOrig = dependencies;
+        dev = {
+          inherit names;
+          manifest = manifestXML manifest;
+        };
+    in
+    let extraIn = extraOutputs // extraInputs // {
+          inherit callPackage;
+          mkDerivation = deriver;
+          dev = dev // { inherit callPackage; };
+        };
+        extraOut = extraOutputs // {
+          dev = dev // {
+            inherit callPackage;
+            mkDerivation = deriver;
+            callAutonixPackage = callAutonixPackage callAutonixAttrs;
+          };
+        };
+        callPackage = newScope (collection // extraIn);
+        callAutonixAttrs = {
+          inherit manifest overrides callPackage deriver;
+          dependencies = breakRecursion dependenciesOrig;
+          srcs = generateSources manifest;
+          resolve = resolveInputs collection extraIn names;
+        };
+        collection =
+          mapAttrs (n: p: callAutonixPackage callAutonixAttrs dir n {}) manifest;
+    in collection // extraOut;
+}
