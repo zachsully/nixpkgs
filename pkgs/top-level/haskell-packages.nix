@@ -220,6 +220,8 @@ self : let callPackage = x : y : modifyPrio (newScope self x y); in
 
   autonixDeps = callPackage ../development/libraries/haskell/autonix-deps {};
 
+  autonixDepsKf5 = callPackage ../development/libraries/haskell/autonix-deps-kf5 {};
+
   base16Bytestring = callPackage ../development/libraries/haskell/base16-bytestring {};
 
   base32Bytestring = callPackage ../development/libraries/haskell/base32-bytestring {};
