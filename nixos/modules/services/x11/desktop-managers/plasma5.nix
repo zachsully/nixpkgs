@@ -59,7 +59,20 @@ in
     services.xserver.desktopManager.session = singleton {
       name = "plasma5";
       bgSupport = true;
-      start = "exec ${plasma5.startkde}/bin/startkde";
+      start = ''
+        # Qt writes a weird ‘libraryPath’ line to
+        # ~/.config/Trolltech.conf that causes the KDE plugin
+        # paths of previous KDE invocations to be searched.
+        # Obviously using mismatching KDE libraries is potentially
+        # disastrous, so here we nuke references to the Nix store
+        # in Trolltech.conf.  A better solution would be to stop
+        # Qt from doing this wackiness in the first place.
+        if [ -e $HOME/.config/Trolltech.conf ]; then
+            sed -e '/nix\\store\|nix\/store/ d' -i $HOME/.config/Trolltech.conf
+        fi
+
+        exec ${plasma5.startkde}/bin/startkde";
+      '';
     };
 
     security.setuidOwners = singleton {
