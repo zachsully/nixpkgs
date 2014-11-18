@@ -114,6 +114,20 @@ fi
 dl=$DESKTOP_LOCKED
 unset DESKTOP_LOCKED # Don't want it in the environment
 
+# Make sure that D-Bus is running
+# D-Bus autolaunch is broken
+if test -z "$DBUS_SESSION_BUS_ADDRESS" ; then
+    eval `@dbus_tools@/bin/dbus-launch --sh-syntax --exit-with-session`
+fi
+if @qt5@/bin/qdbus >/dev/null 2>/dev/null; then
+    : # ok
+else
+    echo 'startkde: Could not start D-Bus. Can you call qdbus?'  1>&2
+    test -n "$ksplash_pid" && kill "$ksplash_pid" 2>/dev/null
+    @xmessage@/bin/xmessage -geometry 500x100 "Could not start D-Bus. Can you call qdbus?"
+    exit 1
+fi
+
 ksplash_pid=
 if test -z "$dl"; then
   # the splashscreen and progress indicator
@@ -220,20 +234,6 @@ else
 fi
 
 echo 'startkde: Starting up...'  1>&2
-
-# Make sure that D-Bus is running
-# D-Bus autolaunch is broken
-if test -z "$DBUS_SESSION_BUS_ADDRESS" ; then
-    eval `@dbus@/bin/dbus-launch --sh-syntax --exit-with-session`
-fi
-if @qt5@/bin/qdbus >/dev/null 2>/dev/null; then
-    : # ok
-else
-    echo 'startkde: Could not start D-Bus. Can you call qdbus?'  1>&2
-    test -n "$ksplash_pid" && kill "$ksplash_pid" 2>/dev/null
-    @xmessage@/bin/xmessage -geometry 500x100 "Could not start D-Bus. Can you call qdbus?"
-    exit 1
-fi
 
 
 # Mark that full KDE session is running (e.g. Konqueror preloading works only
