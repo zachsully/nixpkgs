@@ -11909,6 +11909,8 @@ let
     geoclue = geoclue2;
   };
 
+  orion = callPackage ../misc/themes/orion {};
+
   oxygen-gtk2 = callPackage ../misc/themes/gtk2/oxygen-gtk { };
 
   oxygen-gtk3 = callPackage ../misc/themes/gtk3/oxygen-gtk3 { };
