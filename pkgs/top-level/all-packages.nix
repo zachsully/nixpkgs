@@ -5584,6 +5584,9 @@ let
     automake = automake111x;
   };
 
+  kf5_latest = kf54;
+  kf54 = recurseIntoAttrs (callPackage ../development/libraries/kde-frameworks-5.4 {});
+
   krb5 = callPackage ../development/libraries/kerberos/krb5.nix { };
 
   LASzip = callPackage ../development/libraries/LASzip { };

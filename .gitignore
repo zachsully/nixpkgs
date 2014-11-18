@@ -11,3 +11,5 @@ result-*
 .version-suffix
 
 .DS_Store
+
+/pkgs/development/libraries/kde-frameworks-*/tmp/
