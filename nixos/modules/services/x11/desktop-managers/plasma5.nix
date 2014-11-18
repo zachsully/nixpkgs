@@ -81,7 +81,7 @@ in
             sed -e '/nix\\store\|nix\/store/ d' -i $HOME/.config/Trolltech.conf
         fi
 
-        exec ${plasma5.startkde}/bin/startkde";
+        exec ${plasma5.startkde}/bin/startkde;
       '';
     };
 
