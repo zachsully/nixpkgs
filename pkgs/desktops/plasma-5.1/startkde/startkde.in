@@ -101,6 +101,16 @@ if test -n "$kcminputrc_mouse_cursortheme" -o -n "$kcminputrc_mouse_cursorsize" 
     fi
 fi
 
+# Set a left cursor instead of the standard X11 "X" cursor, since I've heard
+# from some users that they're confused and don't know what to do. This is
+# especially necessary on slow machines, where starting KDE takes one or two
+# minutes until anything appears on the screen.
+#
+# If the user has overwritten fonts, the cursor font may be different now
+# so don't move this up.
+#
+@xsetroot@/bin/xsetroot -cursor_name left_ptr
+
 if test "$kcmfonts_general_forcefontdpi" -ne 0; then
     @xrdb@/bin/xrdb -quiet -merge -nocpp <<EOF
 Xft.dpi: $kcmfonts_general_forcefontdpi
@@ -209,16 +219,6 @@ test -d "$sys_fdir" && @xset@/bin/xset fp+ "$sys_fdir"
 
 # Ask X11 to rebuild its font list.
 @xset@/bin/xset fp rehash
-
-# Set a left cursor instead of the standard X11 "X" cursor, since I've heard
-# from some users that they're confused and don't know what to do. This is
-# especially necessary on slow machines, where starting KDE takes one or two
-# minutes until anything appears on the screen.
-#
-# If the user has overwritten fonts, the cursor font may be different now
-# so don't move this up.
-#
-@xsetroot@/bin/xsetroot -cursor_name left_ptr
 
 # Get Ghostscript to look into user's KDE fonts dir for additional Fontmap
 if test -n "$GS_LIB" ; then
