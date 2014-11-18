@@ -81,11 +81,7 @@ if test $returncode -ne 0; then
 fi
 [ -r $configDir/startupconfig ] && . $configDir/startupconfig
 
-# Set up XCURSOR_PATH
-XCURSOR_PATH=~/.icons
-echo "$XDG_DATA_DIRS" | tr ':' '\n' | while read dir; do
-  XCURSOR_PATH="$XCURSOR_PATH":"$dir/icons":"$dir/pixmaps"
-done
+XCURSOR_PATH=~/.icons:$(echo "$XDG_DATA_DIRS" | tr ":" "\n" | @gnused@/bin/sed 's,$,/icons,g' | tr "\n" ":")
 export XCURSOR_PATH
 
 # XCursor mouse theme needs to be applied here to work even for kded or ksmserver
