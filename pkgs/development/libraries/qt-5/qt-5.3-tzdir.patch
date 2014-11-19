@@ -1,0 +1,16 @@
+diff --git a/qtbase/src/corelib/tools/qtimezoneprivate_tz.cpp b/qtbase/src/corelib/tools/qtimezoneprivate_tz.cpp
+index b4ea91e..1b16a8e 100644
+--- a/qtbase/src/corelib/tools/qtimezoneprivate_tz.cpp
++++ b/qtbase/src/corelib/tools/qtimezoneprivate_tz.cpp
+@@ -68,7 +68,10 @@ typedef QHash<QByteArray, QTzTimeZone> QTzTimeZoneHash;
+ // Parse zone.tab table, assume lists all installed zones, if not will need to read directories
+ static QTzTimeZoneHash loadTzTimeZones()
+ {
+-    QString path = QStringLiteral("/usr/share/zoneinfo/zone.tab");
++    QString path = getenv("TZDIR");
++    path += "/zone.tab";
++    if (!QFile::exists(path))
++        path = QStringLiteral("/usr/share/zoneinfo/zone.tab");
+     if (!QFile::exists(path))
+         path = QStringLiteral("/usr/lib/zoneinfo/zone.tab");
+ 
