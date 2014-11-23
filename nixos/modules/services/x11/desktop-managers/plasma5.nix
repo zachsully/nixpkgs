@@ -180,6 +180,7 @@ in
         sonnet
         threadweaver
 
+        pkgs.kde4.kde_baseapps
         pkgs.kde4.konsole
         pkgs.kde4.oxygen_icons
         pkgs.hicolor_icon_theme
